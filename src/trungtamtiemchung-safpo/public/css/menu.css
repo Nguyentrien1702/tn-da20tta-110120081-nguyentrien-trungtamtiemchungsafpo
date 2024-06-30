@@ -1,0 +1,118 @@
+body{
+    color: black;
+}
+#header{
+    background-color: rgb(255, 255, 255);
+    top: 0;
+    width: 100%;
+    position: fixed;
+    z-index: 1000;
+}
+.container-menu{
+    max-width: 1200px;
+    margin: 0px auto;
+}
+.menu-top{
+    display: flex;
+    justify-content: space-between;
+    justify-items: center;
+    font-weight: bold;
+}
+.menu-top h5{
+    margin-top: 25px;
+    margin-left: 0px;
+    color: red;
+    font-weight: bold;
+}
+#logo{
+    margin: 5px 0px;
+}
+#logo img{
+    max-height: 80px;
+    width: auto;
+}
+hr{
+    border-width: 2px;
+    padding: 0px;
+    margin: 0px;
+
+}
+#main-menu{
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    font-size: 15px;
+}
+#menu-top ul{
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+}
+#menu-top li{
+    position: relative;
+}
+#menu-top p{
+    margin: 0px;
+    font-size: 13px;
+    color: red;
+}
+#menu-top li a{
+    color: rgb(45, 45, 186) !important;
+}
+#menu-top li a, #main-menu li a{
+    color: rgb(0, 0, 0);
+    display: block;
+    padding: 13px 20px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+#main-menu ul.sub-menu{
+    position: absolute;
+    background-color: rgb(77, 77, 205);
+    list-style: none;
+    padding: 0px;
+    border: 1px solid rgb(238, 215, 215);
+    display: none;
+}
+#main-menu ul.sub-menu a{
+    color: rgb(255, 255, 255);
+}
+#main-menu li:hover{
+    background-color: rgb(77, 77, 205);
+}
+#main-menu li:hover>a{
+    color: white;
+}
+#main-menu li:hover>ul.sub-menu{
+    display: block;
+}
+#main-menu ul.sub-menu a{
+    padding: 8px 15px;
+    border-bottom: 1px solid rgb(228, 228, 246);
+}
+#main-menu ul.sub-menu li:hover{
+    background-color: blue;
+}
+#main-menu ul.sub-menu li:last-child a{
+    border: none;
+}
+#content{
+    margin-top: 140px;
+    min-height: 1000px;
+}
+footer{
+    padding: 10px;
+    color: white;
+    background-color: rgb(37, 37, 213);
+}
+footer h5,footer p{
+    margin: 5px 10px;
+    padding: 0px;
+    text-align: center;
+}
