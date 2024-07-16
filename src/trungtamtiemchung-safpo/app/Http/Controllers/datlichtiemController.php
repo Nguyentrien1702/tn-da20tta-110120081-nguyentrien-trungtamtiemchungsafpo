@@ -148,7 +148,7 @@ class datlichtiemController extends Controller
                         $data_dk['magoi'] = $validatedData['magoi'];
                         $data_dk['sotiendathanhtoan'] = $tongtien;
                         DB::table('dangky_goi')->insert($data_dk);
-                    return redirect()->back()->with('success', json_encode($data_dk));
+                    return redirect()->back()->with('success', "Đặt thành công!");
                 }
 
                     // Kiểm tra và xử lý mảng mavc
@@ -207,7 +207,7 @@ class datlichtiemController extends Controller
                             } while ($exists);
                         }
                     }
-                    return redirect()->back()->with('success', json_encode($data_dk));
+                    return redirect()->back()->with('success', "Đặt thành công!");
                 }catch (\Exception $e) {
                     // Xử lý khi có lỗi khác xảy ra
                     return redirect()->back()->with('success', $e->getMessage());
@@ -272,7 +272,7 @@ class datlichtiemController extends Controller
                         $data_dk['magoi'] = $validatedData['magoi'];
                         $data_dk['sotiendathanhtoan'] = $tongtien;
                         DB::table('dangky_goi')->insert($data_dk);
-                    return redirect()->back()->with('success', json_encode($data_dk));
+                    return redirect()->back()->with('success', "Đặt thành công!");
                 }
 
                 // Kiểm tra và xử lý mảng mavc
@@ -330,12 +330,12 @@ class datlichtiemController extends Controller
                             $exists = DB::table('dangky_goi')->where('madk_goi', $madk_goi)->exists();
                         } while ($exists);
                     }
-                    return redirect()->back()->with('success', json_encode($data_dk));
+                    return redirect()->back()->with('success', 'Đặt thành công!');
                 }
             }
 
             // Nếu validation thành công, bạn có thể xử lý dữ liệu và chuyển hướng
-            return redirect()->back()->with('success', json_encode($validatedData));
+            return redirect()->back()->with('success', "Đặt thành công!");
 
         }catch (\Exception $e) {
             // Xử lý khi có lỗi khác xảy ra
@@ -408,6 +408,7 @@ class datlichtiemController extends Controller
         try {            
             $vcles = DB::connection('mysql')->table('dangky_goi')
                 ->where('dangky_goi.trangthaidk', "Đã xác nhận")
+                ->where('dangky_goi.trangthaigoitiem', 'Chưa tiêm')
                 ->join('khachhang', 'khachhang.makh', '=', 'dangky_goi.makh')
                 ->join('chitietlstiem_goi', 'dangky_goi.madk_goi', '=', 'chitietlstiem_goi.madk_goi')
                 ->join('vaccine', 'vaccine.mavc', '=', 'chitietlstiem_goi.mavc')
@@ -478,12 +479,19 @@ class datlichtiemController extends Controller
     }
     
     public function show_quanlylichtiem(){  
-        $dstatcas = DB::connection('mysql')->table('chitietlstiem_goi')
-            ->join('dangky_goi', 'dangky_goi.madk_goi', '=', 'chitietlstiem_goi.madk_goi')
-            ->join('vaccine', 'chitietlstiem_goi.mavc', '=', 'vaccine.mavc')
-            ->join('khachhang', 'khachhang.makh', '=', 'dangky_goi.makh')
-            ->select('vaccine.*', 'khachhang.*', 'dangky_goi.*', 'chitietlstiem_goi.*')
-            ->orderBy('chitietlstiem_goi.trangthaitiem')
+        $tatcalichtiems = DB::table('chitietlstiem_goi as ctg')
+            ->join('dangky_goi as dk', 'ctg.madk_goi', '=', 'dk.madk_goi')
+            ->join('vaccine as v', 'ctg.mavc', '=', 'v.mavc')
+            ->select(
+                'dk.makh',
+                'ctg.ngaytiemdukien',
+                DB::raw('COUNT(*) as soluongvc'),
+                DB::raw('GROUP_CONCAT(v.mavc SEPARATOR ", ") as ds_mavaccine'),
+                DB::raw('GROUP_CONCAT(v.tenvc SEPARATOR ", ") as ds_tenvaccine'),
+                'dk.trangthaidk',
+                'ctg.trangthaitiem'
+            )
+            ->groupBy('dk.makh', 'ctg.ngaytiemdukien', 'dk.trangthaidk', 'ctg.trangthaitiem')
             ->get();
 
         $dschotiems = DB::connection('mysql')->table('chitietlstiem_goi')
@@ -546,7 +554,7 @@ class datlichtiemController extends Controller
             )
             ->get();
 
-        return view('admin.dichvu.dstatcalichtiem', compact('dschotiems', 'dstatcas', 'dsgoitiems', 'goiTiems'));
+        return view('admin.dichvu.dstatcalichtiem', compact('dschotiems', 'tatcalichtiems', 'dsgoitiems', 'goiTiems'));
     }
     
 }

@@ -168,11 +168,21 @@ Route::prefix('Admin')->group(function () {
     
     Route::get('/xntiem/{madk_goi}/{mavc}', [datlichtiemController::class, 'xntiem']);
     Route::get('/Quan-ly-lich-tiem', [datlichtiemController::class, 'show_quanlylichtiem']);
+
     //xác nhận đăng ký
     Route::get('/xngoidk/{madk_goi}', [xllichtiemController::class, 'xngoidk']);
     Route::get('/gettongtien/{madk_goi}', [xllichtiemController::class, 'getTongTien']);
+
     //từ chối đk
     Route::post('/tuchoigoidk', [xllichtiemController::class, 'tuchoigoidk']);
+
+    //nhắc nhở
+    Route::get('/Nhac-nho-den-hen', [xllichtiemController::class, 'showdsvaccinenn']);
+    Route::get('/nhacnhotiem/{madk_goi}/{mavc}/{makh}', [xllichtiemController::class, 'guismsnhacnho']);
+    Route::get('/nhacnhogoi/{madk_goi}/{makh}', [xllichtiemController::class, 'guismsnhacnhogoi']);
+
+    //quá hẹn
+    Route::get('/Nhac-nho-qua-hen', [xllichtiemController::class, 'lichtiemquahen']);
 
     //ajax
     Route::get('/ajax_ctgoitiem', [ajaxController::class, 'ajax_ctgoitiem']);
@@ -186,6 +196,9 @@ Route::prefix('Admin')->group(function () {
 
     Route::get('/doanhthuthang', [adminthongkeController::class, 'getDoanhthuthang']);
     Route::get('/getdkhuythang', [adminthongkeController::class, 'getdkhuythang']);
+    Route::get('/vaccinethang', [adminthongkeController::class, 'getvaccinetheothang']);
+
+    Route::get('/getchitietmuitiemkh', [nv_khachhangController::class, 'getchitietmuitiemkh']);
 });
 
 //Nhân viên

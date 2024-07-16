@@ -67,7 +67,7 @@
                             <td>{{ $vcle->tenvc }}</td>
                             <td>{{ $vcle->ngaytiemmongmuon }}</td>
                             <td>
-                                <a href="" onclick="return confirm('Xác nhận hủy đăng ký!')" class="btn btn-primary btn-sm">
+                                <a href="#" onclick="return confirm('Xác nhận hủy đăng ký!')" class="btn btn-primary btn-sm">
                                     <i class="fas fa-check"></i> Hủy đăng ký
                                 </a>
                             </td>
@@ -111,7 +111,7 @@
                             <td>{{ $vcgoi->soluongmuitiem }}</td>
                             <td>{{ \Carbon\Carbon::parse( $vcgoi->ngaytiemmongmuon )->format('d/m/Y') }}</td>
                             <td>
-                                <a href="" onclick="return confirm('Xác nhận hủy đăng ký!')" class="btn btn-primary btn-sm">
+                                <a href="#" onclick="return confirm('Xác nhận hủy đăng ký!')" class="btn btn-primary btn-sm">
                                     <i class="fas fa-check"></i> Hủy đăng ký
                                 </a>
                             </td>

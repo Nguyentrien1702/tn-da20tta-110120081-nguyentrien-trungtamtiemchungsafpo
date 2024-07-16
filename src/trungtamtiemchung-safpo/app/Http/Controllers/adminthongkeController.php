@@ -116,8 +116,8 @@ class adminthongkeController extends Controller
 
         $slmuitiemdatiem = DB::table('chitietlstiem_goi')
             ->where('trangthaitiem', 'Đã tiêm')
-            ->whereMonth('ngaytiem', $month) // Lọc theo tháng hiện tại
-            ->whereYear('ngaytiem', $year) // Lọc theo năm hiện tại
+            ->whereMonth('ngaytiemthucte', $month) // Lọc theo tháng hiện tại
+            ->whereYear('ngaytiemthucte', $year) // Lọc theo năm hiện tại
             ->count();
 
         $goidk_huy = DB::table('dangky_goi')
@@ -143,6 +143,29 @@ class adminthongkeController extends Controller
         ->groupBy(DB::raw('DATE(ngaydk)'))
         ->orderBy(DB::raw('DATE(ngaydk)'))
         ->get();
+
+        return response()->json($data);
+    }
+    public function getvaccinetheothang()
+    {
+        // Truy vấn cơ sở dữ liệu để lấy số lượng mũi tiêm theo từng ngày
+            $vaccinationData = DB::table('chitietlstiem_goi')
+                ->where('trangthaitiem', 'Đã tiêm')
+                ->select(DB::raw('DATE(ngaytiemthucte) as date, COUNT(*) as total'))
+                ->groupBy(DB::raw('DATE(ngaytiemthucte)'))
+                ->get();
+
+            // Chuẩn bị dữ liệu cho biểu đồ
+            $data = [
+                'dates' => [],
+                'totals' => [],
+            ];
+
+            foreach ($vaccinationData as $item) {
+            $data['dates'][] = $item->date; // Thêm ngày vào mảng dates
+            $data['totals'][] = $item->total; // Thêm số lượng mũi tiêm vào mảng totals
+            }
+
 
         return response()->json($data);
     }

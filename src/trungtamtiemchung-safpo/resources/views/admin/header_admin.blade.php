@@ -84,8 +84,8 @@
                             </a>
                             <div class="collapse" id="nnlichtiem" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="{{ url('/Admin/Lich-tiem-cho-xn') }}">Sắp đến hẹn</a>
-                                    <a class="nav-link" href="{{ url('/Admin/Lich-tiem-da-xn') }}">Quá hẹn</a>
+                                    <a class="nav-link" href="{{ url('/Admin/Nhac-nho-den-hen') }}">Sắp đến hẹn</a>
+                                    <a class="nav-link" href="{{ url('/Admin/Nhac-nho-qua-hen') }}">Quá hẹn</a>
                                 </nav>
                             </div>
 

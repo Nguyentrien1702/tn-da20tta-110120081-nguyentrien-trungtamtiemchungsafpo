@@ -49,22 +49,22 @@
 </ul>
 <div class="tab-content" id="loginTabContent">
     <div class="tab-pane fade show active" id="tatca" role="tabpanel" aria-labelledby="tatca-tab">
-        <h2 class="text-primary">DANH SÁCH TẤT CẢ</h2>
-        <table id="tabletatca" class="table dataTable-table" style="width: 100%; ">
+        <h2 class="text-primary">DANH SÁCH TẤT CẢ LỊCH TIÊM</h2>
+        <table id="tabletclichtiem" class="dataTable-table" style="width: 100%; ">
             <thead>
                 <tr>
                     <th>STT</th>
-                    <th>Mã kh</th>
-                    <th>Tên người tiêm</th>
-                    <th>Ngày sinh</th>
-                    <th>Tên vaccine</th>
-                    <th>Mũi tiêm</th>
-                    <th>Trạng thái tiêm</th>
+                    <th>Mã khách hàng</th>
                     <th>Ngày tiêm dự kiến</th>
+                    <th>Số lượng vaccine</th>
+                    <th>Danh sách vaccine</th>
+                    <th>Trạng thái đăng ký</th>
+                    <th>Trạng thái tiêm</th>
+                    <th id="tt">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
-                @if ($dstatcas->isEmpty())
+                @if ($tatcalichtiems->isEmpty())
                     <tr>
                         <td colspan="8" style="text-align: center;"><i>Không có dữ liệu.</i></td>
                     </tr>
@@ -72,21 +72,61 @@
                     @php
                         $i = 1; 
                     @endphp
-                    @foreach($dstatcas as $dstatca)
+                    @foreach($tatcalichtiems as $tatcalichtiem)
                         <tr>
                             <td>{{$i++}}</td>
-                            <td>{{ $dstatca->makh }}</td>
-                            <td>{{ $dstatca->tenkh }}</td>
-                            <td>{{ \Carbon\Carbon::parse( $dstatca->ngaysinhkh )->format('d/m/Y') }}</td>
-                            <td>{{ $dstatca->tenvc }}</td>
-                            <td>{{ $dstatca->muitiem}}</td>
-                            <td><i style="color: green;">{{ $dstatca->trangthaitiem }}</i></td>
-                            <td>{{ \Carbon\Carbon::parse( $dstatca->ngaytiemdukien )->format('d/m/Y') }}</td>
+                            <td>{{ $tatcalichtiem->makh }}</td>
+                            <td>{{ \Carbon\Carbon::parse( $tatcalichtiem->ngaytiemdukien )->format('d/m/Y') }}</td>
+                            <td>{{ $tatcalichtiem->soluongvc }}</td>
+                            <td>{{ $tatcalichtiem->ds_tenvaccine }}</td>
+                            <td>{{ $tatcalichtiem->trangthaidk }}</td>
+                            <td>{{ $tatcalichtiem->trangthaitiem }}</td>
+                            <td>
+                                <a href="#" class="detail-post" data-ma="{{ $tatcalichtiem->makh }}" data-ngaytiem="{{ $tatcalichtiem->ngaytiemdukien }}">
+                                    <i>Chi tiết</i>
+                                </a>
+                            </td>
                         </tr>
                     @endforeach
                 @endif
             </tbody>
         </table>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="max-width: 65% !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle" style="color: blue; font-weight: bold;">THÔNG TIN CHI TIẾT MŨI TIÊM</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <div id="ttkh"></div>
+                    <table class="dataTable-table" style="margin: auto;">
+                        <thead style="background-color: gainsboro;">
+                            <tr style="text-align: center;">
+                                <th>Tên vaccine</th>
+                                <th>Ngày đăng ký</th>
+                                <th>Ngày tiêm dự kiến</th>
+                                <th>Ngày tiêm thực tế</th>
+                                <th>Trạng thái tiêm</th>
+                                <th>Nhân viên tiêm</th>
+                                <th>Hình thức đăng ký</th>
+                                <th>Tổng thanh toán</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailBody">
+                            <!-- Dữ liệu sẽ được thêm vào đây -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="tab-pane fade" id="chotiem" role="tabpanel" aria-labelledby="chotiem-tab">
@@ -154,7 +194,7 @@
             <tbody>
             @if ($goiTiems->isEmpty())
                     <tr>
-                        <td colspan="9" style="text-align: center;"><i>Không có dữ liệu.</i></td>
+                        <td colspan="10" style="text-align: center;"><i>Không có dữ liệu.</i></td>
                     </tr>
                 @else
                     @php
@@ -256,7 +296,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         initializeDataTable('tablelstiem');
-        initializeDataTable('tabletatca');
+        initializeDataTable('tabletclichtiem');
         initializeDataTable('tabledsgoitiem');
     });
 
@@ -277,6 +317,76 @@
             });
         }
     }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Xử lý sự kiện khi nhấn nút chi tiết
+        document.querySelectorAll('.detail-post').forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault(); // Ngăn chặn hành động mặc định của thẻ a
+
+                var makh = this.getAttribute('data-ma');
+                var ngaytiem = this.getAttribute('data-ngaytiem');
+
+                // Gọi AJAX để lấy chi tiết các mũi tiêm của khách hàng
+                $.ajax({
+                    url: '/Admin/getchitietmuitiemkh', // URL API để lấy chi tiết mũi tiêm
+                    method: 'GET',
+                    data: { makh: makh, ngaytiem: ngaytiem },
+                    success: function(response) {
+                        // Xóa dữ liệu cũ
+                        $('#ttkh').empty();
+                        $('#detailBody').empty();
+                        // Kiểm tra dữ liệu từ server và hiển thị
+                        if (response.details.length > 0) {
+                            response.details.forEach(function(item) {
+                                // Xử lý dữ liệu và hiển thị trong modal
+                                $('#ttkh').html(`
+                                    <p><strong>Mã khách hàng:</strong> ${item.makh}</p>
+                                    <p><strong>Tên khách hàng:</strong> ${item.tenkh}</p>
+                                `);
+                                // Định dạng ngày
+                                var ngaydk = new Date(item.ngaydk).toLocaleDateString('vi-VN');
+                                var ngaytiemdukien = new Date(item.ngaytiemdukien).toLocaleDateString('vi-VN');
+                                var ngaytiemthucte = item.ngaytiemthucte ? new Date(item.ngaytiemthucte).toLocaleString('vi-VN') : '';
+
+                                // Định dạng tiền
+                                var sotiendathanhtoan = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.sotiendathanhtoan);
+
+                                // Thêm dòng vào bảng chi tiết
+                                $('#detailBody').append(`
+                                    <tr>
+                                        <td>${item.tenvc}</td>
+                                        <td>${ngaydk}</td>
+                                        <td>${ngaytiemdukien}</td>
+                                        <td>${ngaytiemthucte}</td>
+                                        <td>${item.trangthaitiem}</td>
+                                        ${(() => {
+                                            let tenNhanVien = '';
+                                            response.nhanviens.forEach(function(nv) {
+                                                if (nv.manv == item.nguoitiem) {
+                                                    tenNhanVien = nv.tennv;
+                                                }
+                                            });
+                                            return `<td>${tenNhanVien}</td>`;
+                                        })()}
+                                        <td>${item.hinhthucdk}</td>
+                                        <td>${sotiendathanhtoan}</td>
+                                    </tr>
+                                `);
+
+                            });
+                        }
+                        
+                        $('#detailModal').modal('show');
+                    },
+                    error: function() {
+                        alert('Đã có lỗi xảy ra. Vui lòng thử lại.');
+                    }
+                });
+            });
+        });
+    });
 </script>
 </body>
 </html>

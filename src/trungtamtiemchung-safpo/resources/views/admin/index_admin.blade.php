@@ -6,9 +6,9 @@
     <title>Trang chủ</title>
     <style>
         .btn.active {
-            background-color: #007bff; /* Màu nền khi nút được chọn */
-            color: #fff; /* Màu chữ khi nút được chọn */
-            border-color: #007bff; /* Màu viền khi nút được chọn */
+            background-color: #007bff !important; /* Màu nền khi nút được chọn */
+            color: #fff !important; /* Màu chữ khi nút được chọn */
+            border-color: #007bff !important; /* Màu viền khi nút được chọn */
         }
     </style>
 </head>
@@ -17,8 +17,8 @@
     <main>
         <div class="container-fluid px-4">
         <div class="mb-3" aria-label="Basic example">
-            <button type="button" class="btn btn-primary mr-3" id="btnOverall" onclick="fetchOverallStatistics()">Toàn bộ</button>
-            <button type="button" class="btn btn-primary" id="btnMonthly" onclick="fetchMonthlyStatistics()">Theo tháng</button>
+            <button type="button" class="btn mr-3" id="btnOverall" style="background-color: gray; color: white" onclick="fetchOverallStatistics()">Toàn bộ</button>
+            <button type="button" class="btn" id="btnMonthly" style="background-color: gray; color: white" onclick="fetchMonthlyStatistics()">Theo tháng</button>
         </div>
             <div class="row">
                 <div class="col-xl-4 col-md-6">
@@ -63,7 +63,7 @@
                 </div>
                 <div class="col-xl-6 col-md-6" style="text-align: center;">
                     <canvas id="vaccineChart"></canvas>
-                    <h4>Số lượng mũi tiêm đã tiêm</h4>
+                    <h4>Số lượng mũi tiêm đã tiêm theo vaccine</h4>
                 </div>
             </div>
             
@@ -77,19 +77,28 @@
 <script src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script>
+    var myChart;
+
     document.addEventListener('DOMContentLoaded', function() {
         fetchOverallStatistics();
+        document.getElementById('btnOverall').classList.add('active');
     });
+
     function fetchOverallStatistics() {
         fetchVaccineStatistics();
         fetchTotalRevenue();
         fetchChartData();
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart_line);
     }
 
     function fetchMonthlyStatistics(){
         fetchTotalRevenuethang();
         fetchChartDatathang();
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart_linethang);
     }
 
     function fetchVaccineStatistics() {
@@ -163,8 +172,7 @@
             }
         });
     }
-    google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawChart_line);
+    
     function drawChart_line() {
         $.ajax({
             url: '/Admin/vaccine',
@@ -194,6 +202,9 @@
         fetch('/Admin/getdkhuy')
             .then(response => response.json())
             .then(data => {
+                if (myChart) {
+                    myChart.destroy();
+                }
                 // Chuẩn bị dữ liệu cho biểu đồ
                 const months = data.map(item => item.thang);
                 const dangky = data.map(item => item.dangky);
@@ -201,7 +212,7 @@
 
                 // Vẽ biểu đồ bằng Chart.js
                 var ctx = document.getElementById('chart_dk_huy').getContext('2d');
-                var myChart = new Chart(ctx, {
+                myChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: months,
@@ -246,26 +257,29 @@
         fetch('/Admin/getdkhuythang')
             .then(response => response.json())
             .then(data => {
+                if (myChart) {
+                    myChart.destroy();
+                }
                 // Chuẩn bị dữ liệu cho biểu đồ
-                const months = data.map(item => moment(item.ngay).format('DD-MM-YYYY'));
-                const dangky = data.map(item => item.dangky);
-                const huy = data.map(item => item.huy);
+                const monthss = data.map(item => moment(item.ngay).format('DD-MM-YYYY'));
+                const dangkys = data.map(item => item.dangky);
+                const huys = data.map(item => item.huy);
 
                 // Vẽ biểu đồ bằng Chart.js
                 var ctx = document.getElementById('chart_dk_huy').getContext('2d');
-                var myChart = new Chart(ctx, {
+                myChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: months,
+                        labels: monthss,
                         datasets: [{
                             label: 'Đăng ký',
-                            data: dangky,
+                            data: dangkys,
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
                             borderColor: 'rgba(54, 162, 235, 1)',
                             borderWidth: 1
                         }, {
                             label: 'Hủy',
-                            data: huy,
+                            data: huys,
                             backgroundColor: 'rgba(255, 99, 132, 0.2)',
                             borderColor: 'rgba(255, 99, 132, 1)',
                             borderWidth: 1
@@ -281,6 +295,31 @@
                 });
             })
             .catch(error => console.error('Error fetching data:', error));
+    }
+    function drawChart_linethang() {
+        $.ajax({
+            url: '/Admin/vaccinethang', // URL endpoint để lấy dữ liệu từng ngày
+            dataType: 'json',
+            success: function(data) {
+                var chartData = [['Ngày', 'Số lượng mũi tiêm']];
+                for (var i = 0; i < data.dates.length; i++) {
+                    var formattedDate = moment(data.dates[i]).format('DD-MM-YYYY');
+                    chartData.push([formattedDate, data.totals[i]]);
+                }
+
+                var options = {
+                    title: 'Số lượng mũi tiêm theo từng ngày',
+                    curveType: 'function',
+                    legend: { position: 'bottom' }
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+                chart.draw(google.visualization.arrayToDataTable(chartData), options);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching data:', error);
+            }
+        });
     }
 </script>
 <script>

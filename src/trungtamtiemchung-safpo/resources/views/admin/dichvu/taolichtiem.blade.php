@@ -320,8 +320,8 @@
                 <td>{{ $lichtiem->tenkh }}</td>
                 <td>{{ \Carbon\Carbon::parse( $lichtiem->ngaysinhkh )->format('d/m/Y')}}</td>
                 <td style="color: green"><i>{{ $lichtiem->trangthaitiem }}</i></td>                    
-                <td><i><a href="" data-bs-toggle="modal"
-                        data-bs-target="#Modalttvaccine" data-mavc="{{ $lichtiem->madk_goi }}">xóa</a></i>
+                <td>
+                    <button class="btn btn-danger" onclick="openmodaltuchoi('{{ $lichtiem->madk_goi }}')">Hủy đăng ký</button>
                 </td>
             </tr>
             @endforeach
@@ -329,9 +329,47 @@
         </tbody>
     </table>
 
+    <div class="modal fade" id="modaltuchoi" tabindex="-1" aria-labelledby="modaltuchoiLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modaltuchoiLabel">Lý do từ chối</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="rejectionForm" method="POST" action="/Admin/tuchoigoidk">
+                    @csrf
+                        <div class="form-group">
+                            <label for="lidotuchoi">Lý do từ chối</label>
+                            <textarea class="form-control" id="lidotuchoi" name="lidotuchoi" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="hoantien">Hoàn tiền</label>
+                            <select class="form-control" id="hoantien" name="hoantien">
+                                <option value="0">Không hoàn tiền</option>
+                                <option value="1">Hoàn tiền</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="madk_goi" name="madk_goi">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-danger" id="confirmRejection">Xác nhận từ chối</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+
 </div>
 @include("admin/footer_admin")
 <script>
+    function openmodaltuchoi(id) {
+        document.getElementById('madk_goi').value = id;
+        $('#modaltuchoi').modal('show');
+    }
 // Hàm mở modal
 function openModal() {
     // Lấy giá trị của hai input

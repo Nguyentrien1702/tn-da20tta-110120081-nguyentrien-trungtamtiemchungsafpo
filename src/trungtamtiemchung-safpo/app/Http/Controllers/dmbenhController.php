@@ -103,7 +103,7 @@ class dmbenhController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Import thành công!');
+        return redirect()->back()->with('success', 'Thêm thành công!');
     }
 
     public function xoadmbenh($mabenh)

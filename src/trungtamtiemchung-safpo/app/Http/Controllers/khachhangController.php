@@ -119,7 +119,5 @@ class khachhangController extends Controller
 
         return view('admin.dichvu.taolichtiem', compact('dsmakhs', 'vaccines', 'goivaccines', 'lichtiems'));
     }
-
-    
     
 }
