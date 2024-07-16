@@ -26,6 +26,4 @@
           http://127.0.0.1:8000/
 
 ## Thông tin liên hệ tác giả
-  - Họ tên: Kim Thị Sô Phi
-  - SĐT: 0382533858
-  - Email:kimthisophi1101@gmail.com
+  - Họ tên: Nguyễn Triến
