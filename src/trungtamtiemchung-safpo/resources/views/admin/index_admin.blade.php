@@ -4,12 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang chủ</title>
+    <style>
+        .btn.active {
+            background-color: #007bff; /* Màu nền khi nút được chọn */
+            color: #fff; /* Màu chữ khi nút được chọn */
+            border-color: #007bff; /* Màu viền khi nút được chọn */
+        }
+    </style>
 </head>
 <body>
     @include("admin/header_admin")
     <main>
         <div class="container-fluid px-4">
-
+        <div class="mb-3" aria-label="Basic example">
+            <button type="button" class="btn btn-primary mr-3" id="btnOverall" onclick="fetchOverallStatistics()">Toàn bộ</button>
+            <button type="button" class="btn btn-primary" id="btnMonthly" onclick="fetchMonthlyStatistics()">Theo tháng</button>
+        </div>
             <div class="row">
                 <div class="col-xl-4 col-md-6">
                     <div class="card bg-primary text-white mb-4">
@@ -69,10 +79,18 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        fetchOverallStatistics();
+    });
+    function fetchOverallStatistics() {
         fetchVaccineStatistics();
         fetchTotalRevenue();
-        fetchChartData()
-    });
+        fetchChartData();
+    }
+
+    function fetchMonthlyStatistics(){
+        fetchTotalRevenuethang();
+        fetchChartDatathang();
+    }
 
     function fetchVaccineStatistics() {
         fetch('/Admin/thongkemuitiem')
@@ -149,7 +167,7 @@
     google.charts.setOnLoadCallback(drawChart_line);
     function drawChart_line() {
         $.ajax({
-            url: '/Admin/vaccinethang',
+            url: '/Admin/vaccine',
             dataType: 'json',
             success: function(data) {
                 var chartData = [['Tháng', 'Số lượng mũi tiêm']];
@@ -211,6 +229,79 @@
                 });
             })
             .catch(error => console.error('Error fetching data:', error));
+    }
+
+    function fetchTotalRevenuethang() {
+        fetch('/Admin/doanhthuthang')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('tongdoanhthu').innerText = dinhdanggia(data.doanhthu) + ' VND';
+                document.getElementById('slmuitiem').innerText = data.slmuitiemdatiem + ' liều';
+                document.getElementById('goidk_huy').innerText = data.goidk_huy + ' gói';
+            })
+            .catch(error => console.error('Error fetching total revenue:', error));
+    }
+    function fetchChartDatathang() {
+        // Gọi AJAX để lấy dữ liệu từ route 'getChartData'
+        fetch('/Admin/getdkhuythang')
+            .then(response => response.json())
+            .then(data => {
+                // Chuẩn bị dữ liệu cho biểu đồ
+                const months = data.map(item => moment(item.ngay).format('DD-MM-YYYY'));
+                const dangky = data.map(item => item.dangky);
+                const huy = data.map(item => item.huy);
+
+                // Vẽ biểu đồ bằng Chart.js
+                var ctx = document.getElementById('chart_dk_huy').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: 'Đăng ký',
+                            data: dangky,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }, {
+                            label: 'Hủy',
+                            data: huy,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('btnOverall').addEventListener('click', function() {
+            handleButtonClick('btnOverall');
+        });
+        document.getElementById('btnMonthly').addEventListener('click', function() {
+            handleButtonClick('btnMonthly');
+        });
+    });
+
+    function handleButtonClick(buttonId) {
+        // Reset all buttons to default background color
+        var buttons = document.getElementsByClassName('btn');
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].classList.remove('active');
+        }
+
+        // Highlight the clicked button
+        document.getElementById(buttonId).classList.add('active');
     }
 </script>
 </body>

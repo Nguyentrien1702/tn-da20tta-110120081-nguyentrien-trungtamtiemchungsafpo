@@ -177,6 +177,25 @@
                 },
                 perPageSelect: [5, 10, 15, 20],
             });
+
+            // Tô màu đỏ cho các dòng có giá trị bằng 0 trong cột số lượng
+            function highlightRows() {
+                document.querySelectorAll("#tablevaccine tbody tr").forEach(function(row) {
+                    var soLuongCell = row.cells[4]; // Cột số lượng là cột thứ 5 (chỉ số 4)
+                    if (soLuongCell.innerText.trim() == "0") {
+                        row.style.backgroundColor = "#eee250"; // Tô màu chữ cho toàn bộ dòng là màu đỏ
+                    }else{
+                        row.style.backgroundColor = "";
+                    }
+                });
+            }
+
+
+            // Initial highlighting
+            highlightRows();
+
+            // Highlight rows whenever the table is updated (e.g., pagination, search)
+            dataTable.on('datatable.update', highlightRows);
         }
 
         // Sự kiện click cho các liên kết "Chi tiết"
@@ -192,16 +211,9 @@
                 document.getElementById('tenvc_benh').innerText = tenvc + ": " + benh_nhombenh;
                 document.getElementById('ttvc').innerHTML = thongtinvc;
             });
-        });
+        })
 
-        // Tô màu đỏ cho các dòng có giá trị bằng 0 trong cột số lượng
-        document.querySelectorAll("#tablevaccine tbody tr").forEach(function(row) {
-            var soLuongCell = row.cells[4]; // Cột số lượng là cột thứ 5 (chỉ số 4)
-            if (soLuongCell.innerText.trim() === "0") {
-                row.style.backgroundColor = "#eee250"; // Tô màu chữ cho toàn bộ dòng là màu đỏ
-
-            }
-        });
+        
         
     });
         

@@ -66,7 +66,7 @@
             <tbody>
                 @if ($dstatcas->isEmpty())
                     <tr>
-                        <td colspan="7" style="text-align: center;"><i>Không có dữ liệu.</i></td>
+                        <td colspan="8" style="text-align: center;"><i>Không có dữ liệu.</i></td>
                     </tr>
                 @else
                     @php
@@ -108,7 +108,7 @@
             <tbody>
                 @if ($dschotiems->isEmpty())
                     <tr>
-                        <td colspan="7" style="text-align: center;"><i>Không có dữ liệu.</i></td>
+                        <td colspan="9" style="text-align: center;"><i>Không có dữ liệu.</i></td>
                     </tr>
                 @else
                     @php
@@ -154,7 +154,7 @@
             <tbody>
             @if ($goiTiems->isEmpty())
                     <tr>
-                        <td colspan="7" style="text-align: center;"><i>Không có dữ liệu.</i></td>
+                        <td colspan="9" style="text-align: center;"><i>Không có dữ liệu.</i></td>
                     </tr>
                 @else
                     @php

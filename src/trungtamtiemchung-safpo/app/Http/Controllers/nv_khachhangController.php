@@ -136,5 +136,45 @@ class nv_khachhangController extends Controller
         ]);
     }
 
+    public function getttdkkhachhang(Request $request)
+    {
+        $makh = $request->input('makh');
+        // Truy vấn dữ liệu các gói tiêm của khách hàng từ database
+        $details = DB::table('dangky_goi')
+                    ->join('chitietlstiem_goi', 'chitietlstiem_goi.madk_goi', '=', 'dangky_goi.madk_goi')
+                    ->join('vaccine', 'chitietlstiem_goi.mavc', '=', 'vaccine.mavc')
+                    ->where('makh', $makh)
+                    ->select('dangky_goi.*', 'vaccine.*', 'chitietlstiem_goi.*')
+                    ->get();
+        $nhanviens = DB::table('nhanvien')->select('nhanvien.*')->get();
+
+        $data = [
+            'details' => $details,
+            'nhanviens' => $nhanviens,
+        ];
     
+        return response()->json($data);
+    }
+    public function getchitietmuitiemkh(Request $request)
+    {
+        $makh = $request->input('makh');
+        $ngaytiem = $request->input('ngaytiem');
+        // Truy vấn dữ liệu các gói tiêm của khách hàng từ database
+        $details = DB::table('dangky_goi')
+                    ->join('chitietlstiem_goi', 'chitietlstiem_goi.madk_goi', '=', 'dangky_goi.madk_goi')
+                    ->join('vaccine', 'chitietlstiem_goi.mavc', '=', 'vaccine.mavc')
+                    ->join('khachhang', 'khachhang.makh', '=', 'dangky_goi.makh')
+                    ->where('dangky_goi.makh', $makh)
+                    ->where('chitietlstiem_goi.ngaytiemdukien', $ngaytiem)
+                    ->select('dangky_goi.*', 'vaccine.*', 'chitietlstiem_goi.*', 'khachhang.*')
+                    ->get();
+        $nhanviens = DB::table('nhanvien')->select('nhanvien.*')->get();
+
+        $data = [
+            'details' => $details,
+            'nhanviens' => $nhanviens,
+        ];
+    
+        return response()->json($data);
+    }
 }

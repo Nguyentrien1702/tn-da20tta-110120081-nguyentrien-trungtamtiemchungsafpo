@@ -306,6 +306,7 @@ class VNpay extends Controller
                                 ->join('vaccine', 'vaccine.mavc', '=', 'chitietlstiem_goi.mavc')
                                 ->where('khachhang.makh', $newkhCode)
                                 ->where('vaccine.mavc', $vaccinele)
+                                ->where('chitietlstiem_goi.trangthaitiem', 'Đã tiêm')
                                 ->count();
 
                             if ($muitiem == 0) {

@@ -200,7 +200,7 @@
                                 <div class="col">
                                     <div class="form-group mb-3">
                                         <h5 style="color: gray; text-align: left">THÔNG TIN THÊM VỀ GÓI VACCINE</h5>
-                                        <textarea class="form-control" id="thongtingoivc1" name="thongtingoivc" rows="3" required></textarea>
+                                        <textarea class="form-control" id="thongtingoivc1" name="thongtingoivc" rows="3"></textarea>
                                         <div class="valid-feedback"></div>
                                         <div class="invalid-feedback">Vui lòng nhập dữ liệu.</div>
                                     </div>

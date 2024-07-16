@@ -48,7 +48,7 @@ class adminthongkeController extends Controller
         return response()->json($data);
     }
 
-    public function getvaccinetheothang()
+    public function getvaccine()
     {
         // Truy vấn cơ sở dữ liệu để lấy số lượng mũi tiêm theo từng tháng
         $vaccinationData = DB::table('chitietlstiem_goi')
@@ -99,6 +99,50 @@ class adminthongkeController extends Controller
             ->groupBy(DB::raw('MONTH(ngaydk)'))
             ->orderBy(DB::raw('MONTH(ngaydk)'))
             ->get();
+
+        return response()->json($data);
+    }
+
+    public function getDoanhthuthang()
+    {
+        $month = Carbon::now()->month; // Lấy tháng hiện tại
+        $year = Carbon::now()->year; // Lấy năm hiện tại
+
+        $doanhthu = DB::table('dangky_goi')
+            ->where('trangthaithanhtoan', 'Đã thanh toán') // Chỉ tính những đăng ký đã thanh toán
+            ->whereMonth('ngaydk', $month) // Lọc theo tháng hiện tại
+            ->whereYear('ngaydk', $year) // Lọc theo năm hiện tại
+            ->sum('tongtien');
+
+        $slmuitiemdatiem = DB::table('chitietlstiem_goi')
+            ->where('trangthaitiem', 'Đã tiêm')
+            ->whereMonth('ngaytiem', $month) // Lọc theo tháng hiện tại
+            ->whereYear('ngaytiem', $year) // Lọc theo năm hiện tại
+            ->count();
+
+        $goidk_huy = DB::table('dangky_goi')
+            ->where('trangthaidk', 'Đã hủy')
+            ->whereMonth('ngaydk', $month) // Lọc theo tháng hiện tại
+            ->whereYear('ngaydk', $year) // Lọc theo năm hiện tại
+            ->count();
+
+        return response()->json([
+            'doanhthu' => $doanhthu,
+            'slmuitiemdatiem' => $slmuitiemdatiem,
+            'goidk_huy' => $goidk_huy
+        ]);
+    }
+
+    public function getdkhuythang()
+    {
+        // Truy vấn SQL để lấy số lượng gói vaccine đăng ký và hủy theo ngày
+        $data = DB::table('dangky_goi')
+        ->selectRaw('DATE(ngaydk) AS ngay, 
+                    SUM(CASE WHEN trangthaidk = "Đã xác nhận" THEN 1 ELSE 0 END) AS dangky, 
+                    SUM(CASE WHEN trangthaidk = "Đã hủy" THEN 1 ELSE 0 END) AS huy')
+        ->groupBy(DB::raw('DATE(ngaydk)'))
+        ->orderBy(DB::raw('DATE(ngaydk)'))
+        ->get();
 
         return response()->json($data);
     }

@@ -428,10 +428,8 @@
                     success: function(data) {
                         data.forEach(function(nhomtuoi) {
                             // Nếu có, đánh dấu checkbox tương ứng
-                            $(`#nhomtuoi${nhomtuoi.manhomtuoi}`).prop('checked', true);
-                            
-                        });
-                        
+                            $(`#nhomtuoi${nhomtuoi.manhomtuoi}`).prop('checked', true);                            
+                        })             
                     }
                 });
                 ckeditorthongtinvc();
@@ -500,6 +498,17 @@
     }
     
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('#tablevaccine tbody tr');
+        rows.forEach(row => {
+            const quantity = row.children[4].textContent.trim();
+            if (quantity == '0') {
+                row.style.backgroundColor = 'yellow';
+            }
+        });
+    });
+</script>
 </body>
 
 </html>

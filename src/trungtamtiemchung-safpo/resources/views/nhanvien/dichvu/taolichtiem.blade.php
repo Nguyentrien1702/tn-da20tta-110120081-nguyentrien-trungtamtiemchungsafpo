@@ -307,7 +307,7 @@
             <!-- Duyệt danh sách -->
             @if ($lichtiems->isEmpty())
             <tr>
-                <td colspan="6" style="text-align: center;"><i>Không có dữ liệu.</i></td>
+                <td colspan="8" style="text-align: center;"><i>Không có dữ liệu.</i></td>
             </tr>
             @else
             @php
@@ -323,16 +323,54 @@
                 <td>{{ $lichtiem->muitiem }}</td>
                 <td style="color: green"><i>{{ $lichtiem->trangthaitiem }}</i></td>                    
                 <td>
-                    <button class="btn btn-danger">Hủy đăng ký</button>
+                    <button class="btn btn-danger" onclick="openmodaltuchoi('{{ $lichtiem->madk_goi }}')">Hủy đăng ký</button>
                 </td>
             </tr>
             @endforeach
             @endif
         </tbody>
     </table>
+
+    <div class="modal fade" id="modaltuchoi" tabindex="-1" aria-labelledby="modaltuchoiLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modaltuchoiLabel">Lý do từ chối</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="rejectionForm" method="POST" action="/Nhanvien/tuchoigoidk">
+                    @csrf
+                        <div class="form-group">
+                            <label for="lidotuchoi">Lý do từ chối</label>
+                            <textarea class="form-control" id="lidotuchoi" name="lidotuchoi" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="hoantien">Hoàn tiền</label>
+                            <select class="form-control" id="hoantien" name="hoantien">
+                                <option value="0">Không hoàn tiền</option>
+                                <option value="1">Hoàn tiền</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="madk_goi" name="madk_goi">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-danger" id="confirmRejection">Xác nhận từ chối</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
 </div>
 @include("nhanvien/footer_nv")
 <script>
+    function openmodaltuchoi(id) {
+        document.getElementById('madk_goi').value = id;
+        $('#modaltuchoi').modal('show');
+    }
     document.addEventListener('DOMContentLoaded', function() {
         initializeDataTable('tablelichtiem');
     });

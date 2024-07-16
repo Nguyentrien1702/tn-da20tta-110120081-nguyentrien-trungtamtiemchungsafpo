@@ -42,8 +42,10 @@ class thongtinkhController extends Controller
                     ->join('vaccine', 'chitietlstiem_goi.mavc', '=', 'vaccine.mavc')
                     ->where('dangky_goi.makh', $makh)
                     ->select('chitietlstiem_goi.*', 'vaccine.*', 'dangky_goi.*')
+                    ->orderByRaw("CASE WHEN chitietlstiem_goi.trangthaitiem = 'Chưa tiêm' THEN 0 ELSE 1 END, chitietlstiem_goi.trangthaitiem")
                     ->get();
-            return view('thongtinkhachhang.lichsutiemchung', compact('lstiems'));
+            $nhanviens = DB::table('nhanvien')->select('nhanvien.*')->get();
+            return view('thongtinkhachhang.lichsutiemchung', compact('lstiems', 'nhanviens'));
         }
     }
 }

@@ -37,7 +37,7 @@
     </script>
 @endif
 <div id="lichhen">
-    <h2 class="text-primary">DANH SÁCH LỊCH HẸN TIÊM VACCINE</h2>
+    <h2 class="text-primary">DANH SÁCH TẤT CẢ LỊCH TIÊM</h2>
     <table id="tablexnlichhen" class="dataTable-table" style="width: 100%; ">
         <thead>
             <tr>
@@ -70,13 +70,52 @@
                         <td>{{ $tatcalichtiem->trangthaidk }}</td>
                         <td>{{ $tatcalichtiem->trangthaitiem }}</td>
                         <td>
-                            <a href="#"><i>Chi tiết</i></a>
+                            <a href="#" class="detail-post" data-ma="{{ $tatcalichtiem->makh }}" data-ngaytiem="{{ $tatcalichtiem->ngaytiemdukien }}">
+                                <i>Chi tiết</i>
+                            </a>
                         </td>
                     </tr>
                 @endforeach
             @endif
         </tbody>
     </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="max-width: 65% !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle" style="color: blue; font-weight: bold;">THÔNG TIN CHI TIẾT MŨI TIÊM</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <div id="ttkh"></div>
+                    <table class="dataTable-table" style="margin: auto;">
+                        <thead style="background-color: gainsboro;">
+                            <tr style="text-align: center;">
+                                <th>Tên vaccine</th>
+                                <th>Ngày đăng ký</th>
+                                <th>Ngày tiêm dự kiến</th>
+                                <th>Ngày tiêm thực tế</th>
+                                <th>Trạng thái tiêm</th>
+                                <th>Nhân viên tiêm</th>
+                                <th>Hình thức đăng ký</th>
+                                <th>Tổng thanh toán</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailBody">
+                            <!-- Dữ liệu sẽ được thêm vào đây -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 </div>
@@ -108,6 +147,76 @@
             });
         }
     }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Xử lý sự kiện khi nhấn nút chi tiết
+        document.querySelectorAll('.detail-post').forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault(); // Ngăn chặn hành động mặc định của thẻ a
+
+                var makh = this.getAttribute('data-ma');
+                var ngaytiem = this.getAttribute('data-ngaytiem');
+
+                // Gọi AJAX để lấy chi tiết các mũi tiêm của khách hàng
+                $.ajax({
+                    url: '/Nhanvien/getchitietmuitiemkh', // URL API để lấy chi tiết mũi tiêm
+                    method: 'GET',
+                    data: { makh: makh, ngaytiem: ngaytiem },
+                    success: function(response) {
+                        // Xóa dữ liệu cũ
+                        $('#ttkh').empty();
+                        $('#detailBody').empty();
+                        // Kiểm tra dữ liệu từ server và hiển thị
+                        if (response.details.length > 0) {
+                            response.details.forEach(function(item) {
+                                // Xử lý dữ liệu và hiển thị trong modal
+                                $('#ttkh').html(`
+                                    <p><strong>Mã khách hàng:</strong> ${item.makh}</p>
+                                    <p><strong>Tên khách hàng:</strong> ${item.tenkh}</p>
+                                `);
+                                // Định dạng ngày
+                                var ngaydk = new Date(item.ngaydk).toLocaleDateString('vi-VN');
+                                var ngaytiemdukien = new Date(item.ngaytiemdukien).toLocaleDateString('vi-VN');
+                                var ngaytiemthucte = item.ngaytiemthucte ? new Date(item.ngaytiemthucte).toLocaleString('vi-VN') : '';
+
+                                // Định dạng tiền
+                                var sotiendathanhtoan = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.sotiendathanhtoan);
+
+                                // Thêm dòng vào bảng chi tiết
+                                $('#detailBody').append(`
+                                    <tr>
+                                        <td>${item.tenvc}</td>
+                                        <td>${ngaydk}</td>
+                                        <td>${ngaytiemdukien}</td>
+                                        <td>${ngaytiemthucte}</td>
+                                        <td>${item.trangthaitiem}</td>
+                                        ${(() => {
+                                            let tenNhanVien = '';
+                                            response.nhanviens.forEach(function(nv) {
+                                                if (nv.manv == item.nguoitiem) {
+                                                    tenNhanVien = nv.tennv;
+                                                }
+                                            });
+                                            return `<td>${tenNhanVien}</td>`;
+                                        })()}
+                                        <td>${item.hinhthucdk}</td>
+                                        <td>${sotiendathanhtoan}</td>
+                                    </tr>
+                                `);
+
+                            });
+                        }
+                        
+                        $('#detailModal').modal('show');
+                    },
+                    error: function() {
+                        alert('Đã có lỗi xảy ra. Vui lòng thử lại.');
+                    }
+                });
+            });
+        });
+    });
 </script>
 </body>
 </html>

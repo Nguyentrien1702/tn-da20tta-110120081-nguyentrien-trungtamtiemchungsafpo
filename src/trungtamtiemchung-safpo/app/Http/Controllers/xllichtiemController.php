@@ -36,7 +36,13 @@ class xllichtiemController extends Controller
             ->first();
         
         if(!empty($lstiem)){
-            DB::connection('mysql')->table('chitietlstiem_goi')->where('madk_goi', $madk_goi)->delete();
+            DB::connection('mysql')->table('chitietlstiem_goi')
+                                ->where('madk_goi', $madk_goi)
+                                ->update(['trangthaitiem' => 'Đã hủy']);
+
+            DB::connection('mysql')->table('vaccine')
+                            ->where('mavc', $lstiem->mavc)
+                            ->increment('soluong', 1);
         }
 
         $ttkh = DB::table('dangky_goi')

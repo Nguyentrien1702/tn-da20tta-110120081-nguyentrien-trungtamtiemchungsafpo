@@ -112,13 +112,14 @@ class goivcController extends Controller
         $validatedData = $request->validate([
             'magoi' => 'nullable|string',
             'tengoivc' => 'required|string',
-            'datcoc' => 'required|numeric',
+            'datcoc' => 'required|string',
             'uudai' => 'required|numeric',
             'vaccine' => 'required|array',
             'vaccine.*.tenvc' => 'required|string',
             'vaccine.*.solieu' => 'required|numeric',
-            'thongtingoivc' => 'required|string'
+            'thongtingoivc' => 'nullable|string'
         ]);
+
         if($validatedData['magoi']==""){
             try {
                 DB::beginTransaction();

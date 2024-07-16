@@ -181,9 +181,11 @@ Route::prefix('Admin')->group(function () {
     Route::get('/thongkemuitiem', [adminthongkeController::class, 'getVaccineStatistics']);
     Route::get('/doanhthu', [adminthongkeController::class, 'getDoanhthu']);
     Route::get('/gioitinh', [adminthongkeController::class, 'getgioitinh']);
-    Route::get('/vaccinethang', [adminthongkeController::class, 'getvaccinetheothang']);
+    Route::get('/vaccine', [adminthongkeController::class, 'getvaccine']);
     Route::get('/getdkhuy', [adminthongkeController::class, 'getdkhuy']);
-    
+
+    Route::get('/doanhthuthang', [adminthongkeController::class, 'getDoanhthuthang']);
+    Route::get('/getdkhuythang', [adminthongkeController::class, 'getdkhuythang']);
 });
 
 //Nhân viên
@@ -195,6 +197,7 @@ Route::prefix('Nhanvien')->group(function () {
     //khách hàng
     Route::get('/Danh-sach-khach-hang', [nv_khachhangController::class, 'showkhachhang']);
     Route::post('/themkhachhang', [nv_khachhangController::class, 'themkhachhang']);
+    Route::get('/getttdkkh', [nv_khachhangController::class, 'getttdkkhachhang']);
 
     //Dịch vụ
     Route::get('/Dang-ky-tiem', function () {
@@ -235,6 +238,8 @@ Route::prefix('Nhanvien')->group(function () {
 
     //tất cả lịch tiêm
     Route::get('/Tat-ca-lich-tiem', [nv_nhacnhoController::class, 'tatcalichtiem']);
+    Route::get('/getchitietmuitiemkh', [nv_khachhangController::class, 'getchitietmuitiemkh']);
+    
     //cập nhật ngày tiêm
     Route::post('/capnhatngaytiem', [nv_nhacnhoController::class, 'capNhatNgayTiem']);
 

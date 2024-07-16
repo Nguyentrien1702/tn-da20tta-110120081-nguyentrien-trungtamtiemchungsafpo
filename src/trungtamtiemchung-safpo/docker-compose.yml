@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:9000"  # Port mapping từ máy host vào container, ví dụ 8000 vào 9000 của PHP-FPM
+    volumes:
+      - .:/var/www/html  # Mount thư mục mã nguồn Laravel vào container
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_URL=http://localhost
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=trungtamtiemchung
+      - DB_USERNAME=root
+      - DB_PASSWORD=
+      - DB_DATABASE2=don_vi_hanh_chinh
+      - LOG_CHANNEL=stack
+      - BROADCAST_DRIVER=log
+      - CACHE_DRIVER=file
+      - FILESYSTEM_DISK=local
+      - QUEUE_CONNECTION=sync
+      - SESSION_DRIVER=file
+      - SESSION_LIFETIME=120
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=mailhog
+      - MAIL_PORT=1025
+      - MAIL_USERNAME=null
+      - MAIL_PASSWORD=null
+      - MAIL_ENCRYPTION=null
+      - MAIL_FROM_ADDRESS=null
+      - MAIL_FROM_NAME="${APP_NAME}"
+    depends_on:
+      - db
+      - mailhog
+
+  db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"  # Port mapping từ máy host vào container MySQL
+    environment:
+      MYSQL_DATABASE: trungtamtiemchung
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 
+      MYSQL_DATABASE2: don_vi_hanh_chinh
+    volumes:
+      - db_data:/var/lib/mysql  # Lưu trữ dữ liệu MySQL
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"  # Port để truy cập Mailhog web UI
+
+volumes:
+  db_data:

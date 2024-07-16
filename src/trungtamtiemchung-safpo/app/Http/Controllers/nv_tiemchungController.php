@@ -11,7 +11,8 @@ class nv_tiemchungController extends Controller
         DB::table('chitietlstiem_goi')
             ->where('madk_goi', $madk_goi)
             ->update(['chitietlstiem_goi.trangthaitiem' => "Đã tiêm",
-                    'ngaytiemthucte' => Carbon::now()]);
+                    'ngaytiemthucte' => Carbon::now(),
+                    'nguoitiem' => session('manhanvien')]);
                 
         DB::table('dangky_goi')
             ->where('madk_goi', $madk_goi)

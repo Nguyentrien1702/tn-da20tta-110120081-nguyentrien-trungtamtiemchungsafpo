@@ -77,7 +77,7 @@
                             <li id="hotline-mocua">
                                 <a href="" class="hotline">
                                     Hotline: 0294 650 8508
-                                    <p class="mocua">Mở cửa 7h30-17h00/T2-CN</p>
+                                    <p class="mocua">Mở cửa 7h30-17h00/T2-T7</p>
                                 </a>
                                 
                             </li>

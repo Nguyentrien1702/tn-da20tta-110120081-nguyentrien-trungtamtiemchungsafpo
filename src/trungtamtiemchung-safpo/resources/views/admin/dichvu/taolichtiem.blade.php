@@ -306,7 +306,7 @@
             <!-- Duyệt danh sách -->
             @if ($lichtiems->isEmpty())
             <tr>
-                <td colspan="6" style="text-align: center;"><i>Không có dữ liệu.</i></td>
+                <td colspan="7" style="text-align: center;"><i>Không có dữ liệu.</i></td>
             </tr>
             @else
             @php

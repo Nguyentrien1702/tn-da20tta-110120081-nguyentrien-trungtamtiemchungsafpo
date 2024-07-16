@@ -40,11 +40,11 @@
             <div class="row">
                 <div class="col-xl-6 col-md-6" style="text-align: center;">
                     <canvas id="chart_dk_huy" ></canvas>
-                    <h4>Số lượng gói vaccine đăng ký và hủy theo tháng</h4>
+                    <h4>Số lượng gói vaccine đăng ký và hủy theo ngày</h4>
                 </div>
                 <div class="col-xl-6 col-md-6" style="text-align: center;">
                     <div id="chart_div" style="height: 400px;"></div>
-                    <h4>Số lượng mũi tiêm theo từng tháng</h4>
+                    <h4>Số lượng mũi tiêm theo từng ngày</h4>
                 </div>
             </div>
             <div class="row mt-5">
@@ -54,7 +54,7 @@
                 </div>
                 <div class="col-xl-6 col-md-6" style="text-align: center;">
                     <canvas id="vaccineChart"></canvas>
-                    <h4>Số lượng mũi tiêm đã tiêm</h4>
+                    <h4>Số lượng mũi tiêm đã tiêm theo vaccine</h4>
                 </div>
             </div>
             
@@ -68,6 +68,8 @@
 <script src="https://use.fontawesome.com/releases/v5.15.1/js/all.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         fetchVaccineStatistics();
@@ -98,19 +100,28 @@
                     options: {
                         scales: {
                             y: {
-                                beginAtZero: true
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1 // Cách nhau 1 đơn vị
                             }
+                        }
                         }
                     }
                 });
             })
             .catch(error => console.error('Error fetching vaccine statistics:', error));
     }
+    var dinhdangtien=0;
     function fetchTotalRevenue() {
         fetch('/Nhanvien/doanhthu')
             .then(response => response.json())
             .then(data => {
-                document.getElementById('tongdoanhthu').innerText = dinhdanggia(data.doanhthu) + ' VND';
+                if(data.doanhthu > 0){
+                    dinhdangtien = dinhdanggia(data.doanhthu)
+                }else{
+                    dinhdangtien =data.doanhthu;
+                }
+                document.getElementById('tongdoanhthu').innerText = dinhdangtien + ' VND';
                 document.getElementById('slmuitiem').innerText = data.slmuitiemdatiem + ' liều';
                 document.getElementById('goidk_huy').innerText = data.goidk_huy + ' gói';
             })
@@ -155,7 +166,8 @@
             success: function(data) {
                 var chartData = [['Ngày', 'Số lượng mũi tiêm']];
                 for (var i = 0; i < data.dates.length; i++) {
-                    chartData.push([data.dates[i], data.totals[i]]);
+                    var formattedDate = moment(data.dates[i]).format('DD-MM-YYYY');
+                    chartData.push([formattedDate, data.totals[i]]);
                 }
 
                 var options = {
@@ -178,7 +190,7 @@
             .then(response => response.json())
             .then(data => {
                 // Chuẩn bị dữ liệu cho biểu đồ
-                const months = data.map(item => item.ngay);
+                const months = data.map(item => moment(item.ngay).format('DD-MM-YYYY'));
                 const dangky = data.map(item => item.dangky);
                 const huy = data.map(item => item.huy);
 

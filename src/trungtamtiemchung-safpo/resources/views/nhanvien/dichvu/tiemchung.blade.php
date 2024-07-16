@@ -74,7 +74,7 @@
         <tbody>
             @if ($dstiemchungs->isEmpty())
                 <tr>
-                    <td colspan="7" style="text-align: center;"><i>Không có dữ liệu.</i></td>
+                    <td colspan="8" style="text-align: center;"><i>Không có dữ liệu.</i></td>
                 </tr>
             @else
                 @php
@@ -92,8 +92,8 @@
                             <a href="{{ url('/Nhanvien/tiemchung', $dstiemchung->madk_goi) }}" onclick="return confirm('Xác nhận tiêm')" class="btn btn-primary btn-sm"  data-id="{{ $dstiemchung->makh }}">Tiêm chủng</a>
                         </td>
                         <td><a href="#"><i>Chi tiết</i></a></td>
-                    </tr>
-                    
+                    </tr>  
+                                      
                 @endforeach
             @endif
         </tbody>
@@ -117,7 +117,7 @@
             <tbody>
             @if ($goiTiems->isEmpty())
                     <tr>
-                        <td colspan="7" style="text-align: center;"><i>Không có dữ liệu.</i></td>
+                        <td colspan="9" style="text-align: center;"><i>Không có dữ liệu.</i></td>
                     </tr>
                 @else
                     @php
