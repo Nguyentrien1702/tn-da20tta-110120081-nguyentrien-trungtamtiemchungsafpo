@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
+
 class VNpay extends Controller
 {
     public function VNP(Request $request)
@@ -143,8 +145,14 @@ class VNpay extends Controller
                 $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
             }
             $request->session()->put('validatedData', $validatedData);
-            // Chuyển hướng người dùng đến VNPAY để thanh toán
-            return redirect()->away($vnp_Url);
+            $kiemTraDieuKien = $this->kiemTraDieuKienTiem($request);
+                if ($kiemTraDieuKien->getData()->status == 'error') {
+                    return redirect()->away('http://127.0.0.1:8000/Dat-lich-tiem')->with('error',  $kiemTraDieuKien->getData()->message);
+                }else{
+                    // Chuyển hướng người dùng đến VNPAY để thanh toán
+                    return redirect()->away($vnp_Url);
+                }
+            
             
         } catch (\Exception $e) {
             // Xử lý lỗi và trả về thông báo lỗi
@@ -183,7 +191,45 @@ class VNpay extends Controller
                 // Lấy validatedData từ session
                 $validatedData = session('validatedData');
                 if(session("khachhang")){
-                    VNpay::datlichtiem_onl_ctk($request);
+                    $kiemTraDieuKien = $this->kiemTraDieuKienTiem($request);
+                    if ($kiemTraDieuKien->getData()->status == 'error') {
+                        // Lấy mã giao dịch VNPay để hoàn tiền
+                        $vnp_TxnRef = $request->vnp_TxnRef;
+                        $vnp_Amount = $request->vnp_Amount;
+
+                        // Thực hiện yêu cầu hoàn tiền tới VNPay
+                        $refundRequest = [
+                            'vnp_TmnCode' => 'OW2FUUD4',
+                            'vnp_HashSecret' => 'MC3ZGAW8QQY0WJIFECEYVDUAL4X8QI5X',
+                            'vnp_Version' => '2.1.0',
+                            'vnp_Command' => 'refund',
+                            'vnp_TxnRef' => $vnp_TxnRef,
+                            'vnp_OrderInfo' => $request->vnp_OrderInfo,
+                            'vnp_Amount' => $vnp_Amount,
+                            // Các thông tin khác cần thiết
+                        ];
+
+                        // Gửi yêu cầu hoàn tiền tới VNPay
+                        $refundResponse = Http::post('https://sandbox.vnpayment.vn/merchant_webapi/merchant.html', $refundRequest);
+
+                        // Xử lý kết quả hoàn tiền từ VNPay
+                        if ($refundResponse->successful()) {
+                            // Hoàn tiền thành công, log lại thông tin hoàn tiền
+                            Log::info('Refund success: ' . $refundResponse->body());
+
+                            // Điều hướng người dùng về trang thông báo hoàn tiền thành công
+                            return redirect()->away('http://127.0.0.1:8000/Dat-lich-tiem')->with('error',  $kiemTraDieuKien->getData()->message);
+                        } else {
+                            // Hoàn tiền thất bại, log lại thông tin lỗi
+                            Log::error('Refund failed: ' . $refundResponse->body());
+
+                            // Điều hướng người dùng về trang thông báo lỗi hoàn tiền
+                            return redirect()->away('http://127.0.0.1:8000/Dat-lich-tiem')->with('error', 'Lỗi hoàn tiền từ VNPay.');
+                        }
+                    }else{
+                        VNpay::datlichtiem_onl_ctk($request);
+                    }
+                    
                 }else{
                     VNpay::datlichtiem_onl($request);
                 }
@@ -526,6 +572,69 @@ class VNpay extends Controller
                 'to' => $phoneNumber,
                 'text' => $message,
             ],
+        ]);
+    }
+
+    public function kiemTraDieuKienTiem(Request $request)
+    {
+        $validatedData = $request->session()->get('validatedData');
+        $makh = session("khachhang");
+        
+        // Kiểm tra nếu người dùng đã đăng ký lịch tiêm cho vaccine này trước đó
+        if (array_key_exists('vaccinele', $validatedData) && filled($validatedData['vaccinele'])) {
+            $vaccinele = $validatedData['vaccinele'];
+            $lichTiem = DB::connection('mysql')->table('chitietlstiem_goi')
+                ->join('dangky_goi', 'dangky_goi.madk_goi', '=', 'chitietlstiem_goi.madk_goi')
+                ->where('dangky_goi.makh', $makh)
+                ->where('chitietlstiem_goi.mavc', $vaccinele)
+                ->where('chitietlstiem_goi.trangthaitiem', '!=', 'Đã hủy')
+                ->orderByRaw("CAST(REPLACE(chitietlstiem_goi.muitiem, 'Mũi ', '') AS UNSIGNED) DESC")
+                ->select('chitietlstiem_goi.*', 'dangky_goi.*')
+                ->first();
+            
+            $vaccine = DB::connection('mysql')->table('vaccine')
+                ->where('mavc', $vaccinele)
+                ->first();
+            if ($lichTiem) {
+                if(!$lichTiem->ngaytiemthucte){
+                    // Lấy ngày tiêm dự kiến từ đối tượng $lichTiem
+                    $ngayTiemDuKien = Carbon::parse($lichTiem->ngaytiemdukien);
+                    
+                    // Tính toán số ngày từ ngày tiêm dự kiến đến ngày hiện tại
+                    $ngayHienTai = Carbon::now();
+                    $soNgay = $ngayHienTai->diffInDays($ngayTiemDuKien);
+
+                    if($soNgay < $vaccine->khoangcachmuitiem){
+                        if ($lichTiem) {
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'Bạn chưa đủ điều kiện để tiêm mũi tiêm này!',
+                            ]);
+                        }
+                    }
+                }else{
+                    // Lấy ngày tiêm dự kiến từ đối tượng $lichTiem
+                    $ngaytiemdukien = Carbon::parse($lichTiem->ngaytiemdukien);
+                        
+                    // Tính toán số ngày từ ngày tiêm dự kiến đến ngày hiện tại
+                    $ngayHienTai = Carbon::now();
+                    $soNgay = $ngayHienTai->diffInDays($ngaytiemdukien);
+
+                    if($soNgay < $vaccine->khoangcachmuitiem){
+                        if ($lichTiem) {
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'Bạn chưa đủ điều kiện để tiêm mũi tiêm này!',
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Bạn đủ điều kiện để đăng ký lịch tiêm.',
         ]);
     }
 }

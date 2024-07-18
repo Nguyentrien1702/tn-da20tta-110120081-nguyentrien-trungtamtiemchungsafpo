@@ -107,4 +107,5 @@ class nv_thongkeController extends Controller
 
         return response()->json($data);
     }
+    
 }

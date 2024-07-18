@@ -20,6 +20,12 @@
         background-color: gainsboro;
         font-size: 16px;
     }
+    .dataTable-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    .dataTable-table tr:nth-child(odd) {
+        background-color: white;
+    }
 </style>
 </head>
 <body>

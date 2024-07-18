@@ -48,7 +48,7 @@
             <div>
                 <div id="menu-top" class="container-menu">
                     <nav class="menu-top">
-                        <a href="" id="logo">
+                        <a href="{{ url('/Trang-chu') }}" id="logo">
                                 <img src="{{ asset('images/logo.png') }}" alt="logo">
                         </a>
                         <h5>PHÒNG TIÊM CHỦNG SAFPO TRÀ VINH</h5>
@@ -75,7 +75,7 @@
                                 
                             </li>
                             <li id="hotline-mocua">
-                                <a href="" class="hotline">
+                                <a href="#" class="hotline">
                                     Hotline: 0294 650 8508
                                     <p class="mocua">Mở cửa 7h30-17h00/T2-T7</p>
                                 </a>
@@ -89,7 +89,7 @@
                     <nav>
                         <ul id="main-menu">
                             <li id="trangchu"><a href="{{ url('/Trang-chu') }}">Trang chủ</a></li>
-                            <li id="gioithieu"><a href="">Giới thiệu</a>
+                            <li id="gioithieu"><a href="#">Giới thiệu</a>
                                 <ul class="sub-menu">
                                     <li><a href="{{ url('/Gioi-thieu/Lich-su-phat-trien') }}">Lịch sử hình thành và phát triển</a></li>
                                     <li><a href="">Giá trị cốt lõi</a></li>
@@ -99,7 +99,7 @@
                                 </ul>
                             </li>
                             <li id="sanpham"><a href="{{ url('/Danh-sach-san-pham') }}">Sản phẩm</a></li>
-                            <li id="lichtiemchung"><a href="">Lịch tiêm chủng</a>
+                            <li id="lichtiemchung"><a href="#">Lịch tiêm chủng</a>
                                 <ul class="sub-menu">
                                     <li><a href="{{ url('/Lich-tiem-chung/Tre-so-sinh') }}">Trẻ sơ sinh (24 giờ - 18 tháng)</a></li>
                                     <li><a href="{{ url('/Lich-tiem-chung/Tre-nho') }}">Nhóm trẻ nhỏ (19 tháng - 6 tuổi)</a></li>
@@ -108,7 +108,7 @@
                                     <li><a href="{{ url('/Lich-tiem-chung/Nhom-dac-biet') }}">Nhóm đặc biệt</a></li>
                                 </ul>                        
                             </li>
-                            <li id="tuvantiemchung"><a href="">Tư vấn tiêm chủng</a>
+                            <li id="tuvantiemchung"><a href="#">Tư vấn tiêm chủng</a>
                                 <ul class="sub-menu">
                                     <li><a href="{{ url('/Tu-van-tiem-chung/Truoc-khi-tiem') }}">Những điều cần biết trước khi chủng ngừa</a></li>
                                     <li><a href="{{ url('/Tu-van-tiem-chung/Sau-khi-tiem') }}">Những điều cần biết sau khi chủng ngừa</a></li>
@@ -118,11 +118,10 @@
                             <li id="tintuc"><a href="{{ url('/Tin-tuc') }}">Tin tức</a></li>
                             <li id="lienhe"><a href="{{ url('/Lien-he') }}">Liên hệ</a></li>
                             @if(session('khachhang'))
-                            <li id="thongtin"><a href="">Thông tin</a>
+                            <li id="thongtin"><a href="#">Thông tin</a>
                                 <ul class="sub-menu">
                                     <li><a href="{{ url('/thongtinkh') }}">Thông tin cá nhân</a></li>
                                     <li><a href="{{ url('/lstiemchung') }}">Lịch sử tiêm chủng</a></li>
-                                    <li><a href="{{ url('') }}">Quên mật khẩu</a></li>
                                     <li><a href="{{ url('/thoat') }}">Thoát</a></li>
                                 </ul>
                             </li>

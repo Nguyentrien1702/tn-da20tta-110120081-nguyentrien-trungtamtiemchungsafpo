@@ -103,6 +103,7 @@
             hr{
                 margin: 0px 0px;
             }
+            
         </style>
 @php
     use Carbon\Carbon;
@@ -157,7 +158,7 @@
                     @endif
                     <div id="successModal" class="modal fade" tabindex="-1" role="dialog">
                         <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content" style="height: 220px; width: 300px;">
+                            <div class="modal-content" style="height: 250px; width: 300px;">
                                 
                                 <div class="modal-body" style="text-align: center;">
                                     <img id="suc_err" src="{{ asset('images/success.png') }}" alt="" style="width: 100px; height: 100px">

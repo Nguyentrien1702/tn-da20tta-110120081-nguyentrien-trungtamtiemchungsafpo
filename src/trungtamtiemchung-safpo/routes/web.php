@@ -197,7 +197,7 @@ Route::prefix('Admin')->group(function () {
     Route::get('/doanhthuthang', [adminthongkeController::class, 'getDoanhthuthang']);
     Route::get('/getdkhuythang', [adminthongkeController::class, 'getdkhuythang']);
     Route::get('/vaccinethang', [adminthongkeController::class, 'getvaccinetheothang']);
-
+    Route::get('/doanhthutheongay', [adminthongkeController::class, 'getDoanhThuTheoNgay']);
     Route::get('/getchitietmuitiemkh', [nv_khachhangController::class, 'getchitietmuitiemkh']);
 });
 

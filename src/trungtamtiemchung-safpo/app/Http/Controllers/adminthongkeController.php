@@ -169,4 +169,16 @@ class adminthongkeController extends Controller
 
         return response()->json($data);
     }
+    public function getDoanhThuTheoNgay()
+    {
+        // Truy vấn cơ sở dữ liệu để lấy doanh thu theo ngày
+        $revenueData = DB::table('dangky_goi')
+            ->selectRaw('DATE(ngaydk) as date, SUM(sotiendathanhtoan) as revenue')
+            ->groupBy(DB::raw('DATE(ngaydk)'))
+            ->orderBy(DB::raw('DATE(ngaydk)'))
+            ->get();
+
+        // Trả về dữ liệu dưới dạng JSON
+        return response()->json($revenueData);
+    }
 }

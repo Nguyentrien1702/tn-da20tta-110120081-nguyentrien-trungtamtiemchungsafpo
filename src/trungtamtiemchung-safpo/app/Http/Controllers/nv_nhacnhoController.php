@@ -168,10 +168,21 @@ class nv_nhacnhoController extends Controller
                     'dangky_goi.trangthaigoitiem' => "Không hoàn thành",
                     'dangky_goi.ghichu' => "Quá hẹn",
                 ]);
+        $lstiem = DB::connection('mysql')->table('chitietlstiem_goi')
+            ->where('chitietlstiem_goi.madk_goi', $madk_goi)
+            ->join('dangky_goi', 'dangky_goi.madk_goi', '=', 'chitietlstiem_goi.madk_goi')
+            ->join('goivaccine', 'goivaccine.magoi', '=', 'dangky_goi.magoi')
+            ->where('goivaccine.loaigoi', 1)
+            ->select('chitietlstiem_goi.*')
+            ->first();
+        $capnhatvc = DB::connection('mysql')->table('vaccine')
+                    ->where('mavc', $lstiem->mavc)
+                    ->increment('soluong', 1);
         $khachhang = DB::table('khachhang')
             ->where('makh', $makh)
             ->select('khachhang.*')
             ->first();
+
         $sdt = $khachhang->sdtkh;
         $noidungtn = "Trung tâm SAFPO xin thông báo đến quý khách hàng. Gói tiêm của quý khách đã được hủy bởi hệ thống.\nLí do: Quá hẹn ngày tiêm\nTrân trọng!";
         $this->sms($sdt, $noidungtn);
@@ -180,19 +191,22 @@ class nv_nhacnhoController extends Controller
 
     public function tatcalichtiem(){
         $tatcalichtiems = DB::table('chitietlstiem_goi as ctg')
-            ->join('dangky_goi as dk', 'ctg.madk_goi', '=', 'dk.madk_goi')
-            ->join('vaccine as v', 'ctg.mavc', '=', 'v.mavc')
-            ->select(
-                'dk.makh',
-                'ctg.ngaytiemdukien',
-                DB::raw('COUNT(*) as soluongvc'),
-                DB::raw('GROUP_CONCAT(v.mavc SEPARATOR ", ") as ds_mavaccine'),
-                DB::raw('GROUP_CONCAT(v.tenvc SEPARATOR ", ") as ds_tenvaccine'),
-                'dk.trangthaidk',
-                'ctg.trangthaitiem'
-            )
-            ->groupBy('dk.makh', 'ctg.ngaytiemdukien', 'dk.trangthaidk', 'ctg.trangthaitiem')
-            ->get();
+        ->join('dangky_goi as dk', 'ctg.madk_goi', '=', 'dk.madk_goi')
+        ->join('vaccine as v', 'ctg.mavc', '=', 'v.mavc')
+        ->select(
+            'dk.makh',
+            'ctg.ngaytiemdukien',
+            DB::raw('COUNT(*) as soluongvc'),
+            DB::raw('GROUP_CONCAT(v.mavc SEPARATOR ", ") as ds_mavaccine'),
+            DB::raw('GROUP_CONCAT(v.tenvc SEPARATOR ", ") as ds_tenvaccine'),
+            'dk.trangthaidk',
+            'ctg.trangthaitiem'
+        )
+        ->where('ctg.trangthaitiem', 'Đã tiêm') // Chỉ lấy những bản ghi có trạng thái tiêm là "Đã tiêm"
+        ->groupBy('dk.makh', 'ctg.ngaytiemdukien', 'dk.trangthaidk', 'ctg.trangthaitiem')
+        ->orderByRaw("ctg.trangthaitiem = 'Đã tiêm' DESC") // Ưu tiên sắp xếp trạng thái tiêm là "Đã tiêm" lên đầu
+        ->orderBy('ctg.ngaytiemdukien', 'DESC') // Sau đó sắp xếp theo ngày mới nhất trước
+        ->get();
 
         return view('nhanvien.tatcalichtiem.tatcalichtiem', compact('tatcalichtiems'));
     }

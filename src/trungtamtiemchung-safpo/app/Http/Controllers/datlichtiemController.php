@@ -480,19 +480,22 @@ class datlichtiemController extends Controller
     
     public function show_quanlylichtiem(){  
         $tatcalichtiems = DB::table('chitietlstiem_goi as ctg')
-            ->join('dangky_goi as dk', 'ctg.madk_goi', '=', 'dk.madk_goi')
-            ->join('vaccine as v', 'ctg.mavc', '=', 'v.mavc')
-            ->select(
-                'dk.makh',
-                'ctg.ngaytiemdukien',
-                DB::raw('COUNT(*) as soluongvc'),
-                DB::raw('GROUP_CONCAT(v.mavc SEPARATOR ", ") as ds_mavaccine'),
-                DB::raw('GROUP_CONCAT(v.tenvc SEPARATOR ", ") as ds_tenvaccine'),
-                'dk.trangthaidk',
-                'ctg.trangthaitiem'
-            )
-            ->groupBy('dk.makh', 'ctg.ngaytiemdukien', 'dk.trangthaidk', 'ctg.trangthaitiem')
-            ->get();
+        ->join('dangky_goi as dk', 'ctg.madk_goi', '=', 'dk.madk_goi')
+        ->join('vaccine as v', 'ctg.mavc', '=', 'v.mavc')
+        ->select(
+            'dk.makh',
+            'ctg.ngaytiemdukien',
+            DB::raw('COUNT(*) as soluongvc'),
+            DB::raw('GROUP_CONCAT(v.mavc SEPARATOR ", ") as ds_mavaccine'),
+            DB::raw('GROUP_CONCAT(v.tenvc SEPARATOR ", ") as ds_tenvaccine'),
+            'dk.trangthaidk',
+            'ctg.trangthaitiem'
+        )
+        ->where('ctg.trangthaitiem', 'Đã tiêm') // Chỉ lấy những bản ghi có trạng thái tiêm là "Đã tiêm"
+        ->groupBy('dk.makh', 'ctg.ngaytiemdukien', 'dk.trangthaidk', 'ctg.trangthaitiem')
+        ->orderByRaw("ctg.trangthaitiem = 'Đã tiêm' DESC") // Ưu tiên sắp xếp trạng thái tiêm là "Đã tiêm" lên đầu
+        ->orderBy('ctg.ngaytiemdukien', 'DESC') // Sau đó sắp xếp theo ngày mới nhất trước
+        ->get();
 
         $dschotiems = DB::connection('mysql')->table('chitietlstiem_goi')
             ->join('dangky_goi', 'dangky_goi.madk_goi', '=', 'chitietlstiem_goi.madk_goi')

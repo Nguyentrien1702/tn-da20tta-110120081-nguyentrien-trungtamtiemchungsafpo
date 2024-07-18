@@ -18,7 +18,7 @@
         <div class="container-fluid px-4">
         <div class="mb-3" aria-label="Basic example">
             <button type="button" class="btn mr-3" id="btnOverall" style="background-color: gray; color: white" onclick="fetchOverallStatistics()">Toàn bộ</button>
-            <button type="button" class="btn" id="btnMonthly" style="background-color: gray; color: white" onclick="fetchMonthlyStatistics()">Theo tháng</button>
+            <button type="button" class="btn" id="btnMonthly" style="background-color: gray; color: white" onclick="fetchMonthlyStatistics()">Trong tháng</button>
         </div>
             <div class="row">
                 <div class="col-xl-4 col-md-6">
@@ -66,6 +66,12 @@
                     <h4>Số lượng mũi tiêm đã tiêm theo vaccine</h4>
                 </div>
             </div>
+            <div class="row mt-5">
+                <div class="col-xl-6 col-md-6" style="text-align: center;">
+                    <canvas id="revenueChart"></canvas>
+                    <h4>Doanh thu theo ngày</h4>
+                </div>
+            </div>
             
         </div>
     </main>
@@ -80,6 +86,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script>
     var myChart;
+    var myChart1;
 
     document.addEventListener('DOMContentLoaded', function() {
         fetchOverallStatistics();
@@ -92,6 +99,7 @@
         fetchChartData();
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawChart_line);
+        fetchDailyRevenue();
     }
 
     function fetchMonthlyStatistics(){
@@ -99,6 +107,7 @@
         fetchChartDatathang();
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawChart_linethang);
+        fetchDailyRevenue();
     }
 
     function fetchVaccineStatistics() {
@@ -320,6 +329,43 @@
                 console.error('Error fetching data:', error);
             }
         });
+    }
+    function fetchDailyRevenue() {
+        // Gọi AJAX để lấy dữ liệu từ route 'getDoanhThuTheoNgay'
+    fetch('/Admin/doanhthutheongay')
+        .then(response => response.json())
+        .then(data => {
+            if (window.myLineChart) {
+                window.myLineChart.destroy();
+            }
+            // Chuẩn bị dữ liệu cho biểu đồ
+            const dates = data.map(item => moment(item.date).format('DD-MM-YYYY'));
+            const revenues = data.map(item => item.revenue);
+
+            // Vẽ biểu đồ bằng Chart.js
+            var ctx = document.getElementById('revenueChart').getContext('2d');
+            window.myLineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Doanh thu',
+                        data: revenues,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
     }
 </script>
 <script>

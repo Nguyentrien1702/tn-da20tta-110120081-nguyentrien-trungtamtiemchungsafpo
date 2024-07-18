@@ -110,7 +110,8 @@
                             <p><strong>Ngày tiêm dự kiến:</strong> <span id="detail-ngaytiemdukien"></span></p>
                             <p><strong>Ngày tiêm thực tế:</strong> <span id="detail-ngaytiemthucte"></span></p>
                             <p><strong>Trạng thái đăng ký:</strong> <span id="detail-trangthaidk" ></span></p>
-   
+                            <div id="lidohuy"  style="display: none">
+                            <p ><strong>Lí do:</strong> <span id="detail-lido" ></span></p></div>
                         </div>
                         <div class="col">
                             <p style="color: gray;">THÔNG TIN TIÊM CHỦNG</p>
@@ -158,7 +159,12 @@
             $('#detail-trangthaidk').text(details.trangthaidk);
             $('#detail-hinhthuctt').text(details.hinhthucdk);
             $('#detail-tientt').text(formatCurrency(details.sotiendathanhtoan));
-
+            if (details.ghichu != null && details.ghichu !== "") {
+                document.getElementById('lidohuy').style.display = "block";
+                $('#detail-lido').text(details.ghichu);
+            }else{
+                document.getElementById('lidohuy').style.display = "none";
+            }
             // Tìm tên nhân viên dựa vào mã nhân viên
             var tenNhanVien = nhanviens.find(function (nv) {
                 return nv.manv === details.nguoitiem;

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh mục khách hàng</title>
     <script src="{{ asset('backend/ckeditor_4.22.1_full_easyimage/ckeditor/ckeditor.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <style>
         h2 {
             text-align: center;
@@ -196,13 +198,49 @@
                                 <i class="fas fa-edit"></i> Sửa
                             </button>
                         </td>
-                        <td><a href=""><i>Chi tiết</i></a></td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm detail-post" data-ma="{{ $khachhang->makh }}">
+                                <i class="fas fa-info-circle"></i> Chi tiết
+                            </button>
+                        </td>
                     </tr>
                 @endforeach
             @endif
         </tbody>
     </table>
-
+  <!-- Modal Chi tiết -->
+  <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" style="max-width: 65% !important;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel" style="color: blue; font-weight: bold;">CHI TIẾT KHÁCH HÀNG</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="dataTable-table" style="margin: auto;">
+                        <thead style="background-color: gainsboro;">
+                            <tr style="text-align: center;">
+                                <th>Tên vaccine</th>
+                                <th>Ngày đăng ký</th>
+                                <th>Ngày tiêm dự kiến</th>
+                                <th>Ngày tiêm thực tế</th>
+                                <th>Trạng thái tiêm</th>
+                                <th>Nhân viên tiêm</th>
+                                <th>Hình thức đăng ký</th>
+                                <th>Tổng thanh toán</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailBody">
+                            <!-- Dữ liệu sẽ được thêm vào đây -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @include("admin/footer_admin")
@@ -294,6 +332,74 @@
         this.value = this.value.replace(/[^0-9]/g, '');
     });
 
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Đoạn code xử lý bảng và form ở đây...
+        
+        // Xử lý sự kiện khi nhấn nút chi tiết
+        document.querySelectorAll('.detail-post').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var makh = this.getAttribute('data-ma');
+                // Gọi AJAX để lấy chi tiết các gói tiêm của khách hàng
+                $.ajax({
+                    url: '/Nhanvien/getttdkkh', // URL API để lấy chi tiết gói tiêm
+                    method: 'GET',
+                    data: { makh: makh },
+                    success: function(response) {
+                        // Xóa dữ liệu cũ trong bảng
+                        $('#detailBody').empty();
+                        // Kiểm tra dữ liệu từ server và hiển thị
+                        if (response.details.length > 0) {
+                            response.details.forEach(function(item) {
+                                // Định dạng ngày
+                                var ngaydk = new Date(item.ngaydk).toLocaleDateString('vi-VN');
+                                var ngaytiemdukien = new Date(item.ngaytiemdukien).toLocaleDateString('vi-VN');
+                                var ngaytiemthucte = item.ngaytiemthucte ? new Date(item.ngaytiemthucte).toLocaleString('vi-VN') : '';
+
+                                // Định dạng tiền
+                                var sotiendathanhtoan = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.sotiendathanhtoan);
+
+                                // Thêm dòng vào bảng chi tiết
+                                $('#detailBody').append(`
+                                    <tr>
+                                        <td>${item.tenvc}</td>
+                                        <td>${ngaydk}</td>
+                                        <td>${ngaytiemdukien}</td>
+                                        <td>${ngaytiemthucte}</td>
+                                        <td>${item.trangthaitiem}</td>
+                                        ${(() => {
+                                            let tenNhanVien = '';
+                                            response.nhanviens.forEach(function(nv) {
+                                                if (nv.manv == item.nguoitiem) {
+                                                    tenNhanVien = nv.tennv;
+                                                }
+                                            });
+                                            return `<td>${tenNhanVien}</td>`;
+                                        })()}
+                                        <td>${item.hinhthucdk}</td>
+                                        <td>${sotiendathanhtoan}</td>
+                                    </tr>
+                                `);
+                            });
+                        } else {
+                            // Nếu không có dữ liệu
+                            $('#detailBody').append(`
+                                <tr>
+                                    <td colspan="8" class="text-center">Không có dữ liệu</td>
+                                </tr>
+                            `);
+                        }
+                        // Mở modal chi tiết
+                        $('#detailModal').modal('show');
+                    },
+                    error: function() {
+                        alert('Đã có lỗi xảy ra. Vui lòng thử lại.');
+                    }
+                });
+            });
+        });
+    });
 </script>
 </body>
 </html>

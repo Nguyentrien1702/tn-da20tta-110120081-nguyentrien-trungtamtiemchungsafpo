@@ -369,6 +369,16 @@ class xllichtiemController extends Controller
                     'dangky_goi.trangthaigoitiem' => "Không hoàn thành",
                     'dangky_goi.ghichu' => "Quá hẹn",
                 ]);
+        $lstiem = DB::connection('mysql')->table('chitietlstiem_goi')
+            ->where('chitietlstiem_goi.madk_goi', $madk_goi)
+            ->join('dangky_goi', 'dangky_goi.madk_goi', '=', 'chitietlstiem_goi.madk_goi')
+            ->join('goivaccine', 'goivaccine.magoi', '=', 'dangky_goi.magoi')
+            ->where('goivaccine.loaigoi', 1)
+            ->select('chitietlstiem_goi.*')
+            ->first();
+        $capnhatvc = DB::connection('mysql')->table('vaccine')
+                    ->where('mavc', $lstiem->mavc)
+                    ->increment('soluong', 1);
         $khachhang = DB::table('khachhang')
             ->where('makh', $makh)
             ->select('khachhang.*')
