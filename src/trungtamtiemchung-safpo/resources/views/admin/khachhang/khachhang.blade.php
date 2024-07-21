@@ -143,7 +143,7 @@
             <!-- Modal footer -->
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Thêm</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Đóng</button>
             </div>
             </form>
         </div>
@@ -162,7 +162,8 @@
                 <th>Số điện thoại</th>
                 <th>Email</th>
                 <th>Địa chỉ</th>
-                <th colspan="2">Thao tác</th>
+                <th>Thao tác</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -281,10 +282,7 @@
                 errorDiv.style.display = 'block';
             }
         });
-
-    });
-    // Xử lý sự kiện khi nhấn nút sửa
-    document.querySelectorAll('.edit-post').forEach(function(button) {
+        document.querySelectorAll('.edit-post').forEach(function(button) {
     button.addEventListener('click', function() {
         // Lấy dữ liệu từ nút Sửa
         var makh = this.getAttribute('data-ma');
@@ -313,6 +311,9 @@
 });
     
 
+    });
+    // Xử lý sự kiện khi nhấn nút sửa
+    
     // Khởi tạo modal khi nhấn nút thêm mới
     document.getElementById('btn-themkhachhang').addEventListener('click', function() {
         document.querySelector('.modal-title').innerText = 'THÊM KHÁCH HÀNG';

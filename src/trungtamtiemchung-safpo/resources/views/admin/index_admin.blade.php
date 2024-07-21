@@ -58,8 +58,8 @@
             </div>
             <div class="row mt-5">
                 <div class="col-xl-6 col-md-6" style="text-align: center;">
-                    <div id="piechart" style="width: 800px; height: 400px;"></div>
-                    <h4>Tỉ lệ số lượng khách hàng theo từng giới tính</h4>
+                    <canvas id="revenueChart"></canvas>
+                    <h4>Doanh thu theo ngày</h4>
                 </div>
                 <div class="col-xl-6 col-md-6" style="text-align: center;">
                     <canvas id="vaccineChart"></canvas>
@@ -67,10 +67,11 @@
                 </div>
             </div>
             <div class="row mt-5">
-                <div class="col-xl-6 col-md-6" style="text-align: center;">
-                    <canvas id="revenueChart"></canvas>
-                    <h4>Doanh thu theo ngày</h4>
+            <div class="col-xl-6 col-md-6" style="text-align: center;">
+                    <div id="piechart" style="width: 800px; height: 400px;"></div>
+                    <h4>Tỉ lệ số lượng khách hàng theo từng giới tính</h4>
                 </div>
+                
             </div>
             
         </div>

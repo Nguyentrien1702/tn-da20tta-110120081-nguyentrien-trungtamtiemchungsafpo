@@ -58,13 +58,16 @@
                             <input type="file" class="form-control-file" id="hinhanhbanner" name="hinhanhbanner">
                             <img id="previewImage" src="" alt="Preview" style="display: none; max-width: 100%; max-height: 200px; margin-top: 10px;">
                         </div>
+                        <div style="color: red;">
+                            <p>Kích thước banner: 1100px x 400px hoặc 1200px x 450px</p>
+                        </div>
                     
                 </div>
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary" >Thêm</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Đóng</button>
                 </div>
                 </form>
             </div>

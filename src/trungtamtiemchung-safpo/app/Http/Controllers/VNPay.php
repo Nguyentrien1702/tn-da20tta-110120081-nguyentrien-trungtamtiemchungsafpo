@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class VNpay extends Controller
 {
@@ -292,12 +293,12 @@ class VNpay extends Controller
                     'mavaitro' => 'vt04',
                 ];
                 $data['makh'] = $newkhCode;
-                $matkhau = $newkhCode."@";
+                $matkhau = $this->generateRandomString(8);;
                 $data['matkhau'] = md5($matkhau);
 
                 $khachhang = DB::table('khachhang')->insert($data);
                 $sdt = $validatedData['sodienthoai'];
-                $noidungtn = "Quý khách vừa đăng ký tiêm chủng thành công tại trung tâm SAFPO Trà Vinh. \n Quý khách được cung cấp mã khách hàng và mật khẩu để có thể theo dõi và tra cứu lịch tiêm là:\nMKH: ".$newkhCode."\nMK: " .$newkhCode."@ \nTrân trọng!";
+                $noidungtn = "Quý khách vừa đăng ký tiêm chủng thành công tại trung tâm SAFPO Trà Vinh. \n Quý khách được cung cấp mã khách hàng và mật khẩu để có thể theo dõi và tra cứu lịch tiêm là:\nMKH: ".$newkhCode."\nMK: " .$matkhau."\nTrân trọng!";
                 $this->sms($sdt, $noidungtn);
                 if($khachhang){
                     // Hàm tạo mã ngẫu nhiên
@@ -426,6 +427,16 @@ class VNpay extends Controller
             // Xử lý lỗi và trả về thông báo lỗi
             return redirect()->back()->with(['error' => 'Có lỗi xảy ra trong quá trình chuẩn bị thanh toán. Vui lòng thử lại sau.']);
         }
+    }
+
+    public function generateRandomString($length = 8) {
+        $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 
     public function datlichtiem_onl_ctk(Request $request){
@@ -563,7 +574,7 @@ class VNpay extends Controller
 
         $client = new Client();
 
-        $response = $client->post('https://8gq2k9.api.infobip.com/sms/1/text/single', [
+        $response = $client->post('https://z1xwk3.api.infobip.com/sms/1/text/single', [
             'headers' => [
                 'Authorization' => 'App ' . $infobipApiKey,
             ],
